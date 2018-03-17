@@ -5,7 +5,7 @@ data = preprocess(load_mnist())
 # d: dimension of vector, k: hash length, p: probability of 1 in fly hash matrix
 n, d = data.shape[0], data.shape[1]
 query_size = 1000
-p = 0.02
+p = 0.1
 
 ks = np.array([2, 4, 8, 12, 16, 20, 24, 28, 32, 40])
 k_num = ks.shape[0]
@@ -24,15 +24,14 @@ for i in range(k_num):
         queries = np.random.choice(n, query_size, False)
         gaussian_matrix = createGaussianMatrix(k, d)
         fly_matrix = createFlyMatrix(k, d, p)
-        fly_matrix_expansion = createFlyMatrix(20*k, d, p)
+        expan_mat = createFlyMatrix(20*k, d, p)
         
-        gaussian[i] += mAP(data, queries, gaussian_matrix)
-        fly[i] += mAP(data, queries, fly_matrix)
-        fly_expansion[i] += mAP(data, queries, fly_matrix_expansion, expansion=True, k=k)
-        fly_WTA[i] += mAP(data, queries, fly_matrix_expansion, expansion=True, k=k, 
-                            WTA=True)
-        fly_binary[i] += mAP(data, queries, fly_matrix_expansion, expansion=True, k=k,
-                                WTA=True, binary=True)
+        # mAP(data, queries, proj_matrix, hash_length, WTA = 'all', knn_size = 200)
+        gaussian[i] += mAP(data, queries, gaussian_matrix, k)
+        fly[i] += mAP(data, queries, fly_matrix, k)
+        fly_expansion[i] += mAP(data, queries, expan_mat, k, 'random')
+        fly_WTA[i] += mAP(data, queries, expan_mat, k, 'top')
+        fly_binary[i] += mAP(data, queries, expan_mat, k, 'binary')
         
     gaussian[i] /= repeat_times
     fly[i] /= repeat_times

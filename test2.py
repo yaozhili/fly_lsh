@@ -5,7 +5,7 @@ data = preprocess(load_mnist())
 # d: dimension of vector, k: hash length, p: probability of 1 in fly hash matrix
 n, d = data.shape[0], data.shape[1]
 query_size = 1000
-p = 0.02
+p = 0.1
 
 ks = np.array([2, 4, 8, 12, 16, 20, 24, 28, 32, 40])
 k_num = ks.shape[0]
@@ -22,8 +22,8 @@ for i in range(k_num):
         gaussian_matrix = createGaussianMatrix(k, d)
         fly_matrix = createFlyMatrix(10*d, d, p)
         
-        gaussian[i] += mAP(data, queries, gaussian_matrix)
-        fly[i] += mAP(data, queries, fly_matrix, expansion=True, k = k, WTA=True)
+        gaussian[i] += mAP(data, queries, gaussian_matrix, k)
+        fly[i] += mAP(data, queries, fly_matrix, k, 'top')
         
     gaussian[i] /= repeat_times
     fly[i] /= repeat_times
